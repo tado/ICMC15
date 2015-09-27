@@ -63,7 +63,7 @@ void ImageSynth::draw(){
             rot += rotSpeed;
 
             ofScale(1.0, 1.0, zscale);
-            ofSetColor(255, 210);
+            ofSetColor(255, 190);
             inputImage.getTexture().bind();
             mesh.draw();
             inputImage.getTexture().unbind();

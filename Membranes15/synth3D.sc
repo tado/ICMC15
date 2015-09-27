@@ -58,5 +58,17 @@ SynthDef("col_closefx", {
 	32.do({ in = AllpassL.ar(in, 0.1, LFNoise2.kr([rrand(0.0, 0.1),rrand(0.0, 0.1)],0.01,0.06), 0.5) });
 	out = CompanderD.ar(in) * amp;
 	Out.ar(0, out);
+	//Out.ar(7, out);
+}).store;
+
+SynthDef("col_comb", {
+	arg amp = 0.0;
+	var out;
+	out = In.ar(5, 2) + In.ar(3, 2);
+	out = CombL.ar(out, 1.0,  MouseX.kr(0.005, 0.1), 20);
+	//in = Pan2.ar(in, LFNoise0.kr(1));
+	//out = out * amp;
+	out = Limiter.ar(out) * amp;
+	Out.ar(0, out);
 }).store;
 )

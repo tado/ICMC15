@@ -8,6 +8,8 @@ void ofApp::setup(){
     ofSetFrameRate(60);
     ofBackground(0);
     ofSetLineWidth(1.0);
+    pressed = false;
+    //ofEnableBlendMode(OF_BLENDMODE_ADD);
     //cam.setFarClip(100000);
     //cam.setFov(110);
     //ofSetWindowPosition(1920, 0);
@@ -22,6 +24,10 @@ void ofApp::setup(){
     fx->create();
     sawFx = new ofxSCSynth("col_closefx");
     sawFx->create();
+    
+    comb = new ofxSCSynth("col_comb");
+    comb->set("amp", 0.0);
+    comb->create();
     
     zscale.addListener(this, &ofApp::zscaleChanged);
     fov.addListener(this, &ofApp::fovChanged);
@@ -49,7 +55,17 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofEnableDepthTest();
+    if (pressed) {
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        ofSetColor(0, 0, 0, 1);
+        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+        //ofEnableBlendMode(OF_BLENDMODE_DISABLED);
+        //ofDisableDepthTest();
+    } else {
+        ofEnableDepthTest();
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    }
+    
     cam.begin();
     for (int i = 0; i < imageSynths.size(); i++) {
         imageSynths[i]->draw();
@@ -59,8 +75,8 @@ void ofApp::draw(){
     
     gui.draw();
     
-    ofColor(255);
-    ofDrawCircle(mouseX, mouseY, 10);
+    //ofColor(255);
+    //ofDrawCircle(mouseX, mouseY, 10);
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo){
@@ -125,6 +141,11 @@ void ofApp::keyPressed(int key){
         }
         imageSynths.clear();
     }
+    if (key == ' ') {
+        ofSetBackgroundAuto(false);
+        pressed = true;
+        comb->set("amp", 1.0);
+    }
 }
 
 void ofApp::zscaleChanged(float & zscale){
@@ -138,7 +159,11 @@ void ofApp::fovChanged(float & fov){
 }
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
+    if (key == ' ') {
+        ofSetBackgroundAuto(true);
+        pressed = false;
+        comb->set("amp", 0.0);
+    }
 }
 
 //--------------------------------------------------------------

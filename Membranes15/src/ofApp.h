@@ -28,7 +28,7 @@ public:
     void zscaleChanged(float & zscale);
     void fovChanged(float & fov);
     
-    ofxSCSynth *fx, *sawFx;
+    ofxSCSynth *fx, *sawFx, *comb;
     deque<ImageSynth*> imageSynths;
     ofEasyCam cam;
     
@@ -41,4 +41,5 @@ public:
     deque<SawSynth *> saws;
     float zscaleRatio, currentZscale;
     float freqRatio;
+    bool pressed;
 };
