@@ -7,7 +7,7 @@ ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
     for (int i = 0; i < filterSize; i++) {
         synth[i] = new ofxSCSynth("simpleSine");
         //synth[i]->set("freq", powf(freqRatio, i) + 80);
-        synth[i]->set("freq", powf(freqRatio, i) + 40);
+        synth[i]->set("freq", powf(freqRatio, i) + 20);
         synth[i]->set("detune", ofRandom(0.9,1.1));
         synth[i]->create();
         
@@ -41,15 +41,15 @@ ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
 }
 
 void ImageSynth::update(){
-    //if (ofGetFrameNum() % 10 == 0) {
-        sumLevel = 0;
-        scanX = (ofGetFrameNum() - startFrame) % int(synthImage.getWidth());
+    
+    sumLevel = 0;
+    scanX = (ofGetFrameNum() - startFrame) % int(synthImage.getWidth());
+    if (ofGetFrameNum() % 2 == 0) {
         for (int i = 0; i < filterSize; i++) {
             synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) / float(filterSize) * 0.5);
         }
-    //}
-    
-    zscale = ofNoise((ofGetElapsedTimef() - startFrame) / 10.0) * zscaleRatio;
+    }
+    zscale = ofNoise(((ofGetElapsedTimef() - startFrame) * 2.0 - 1.0) / 10.0) * zscaleRatio;
 }
 
 void ImageSynth::draw(){
