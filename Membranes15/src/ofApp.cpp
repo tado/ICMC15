@@ -14,7 +14,7 @@ void ofApp::setup(){
     
     sawNum = 0;
     zscaleRatio = currentZscale = 0.0;
-    freqRatio = 1.1;
+    freqRatio = 1.2;
 
     //ofxSuperColliderServer::init(57110, 96000);
     //ofxSuperColliderServer::init();
@@ -25,12 +25,13 @@ void ofApp::setup(){
     
     zscale.addListener(this, &ofApp::zscaleChanged);
     fov.addListener(this, &ofApp::fovChanged);
-    // gui.setup();
-    // gui.add(freqRatio.setup("freqRatio", 1.3, 1.0, 2.0));
-    // gui.add(zscale.setup("z-scale", 0.0, 0.0, 10.0));
-    // gui.add(fov.setup("fov", 60, 10, 180));
-    // gui.loadFromFile("settings.xml");
-    
+    /*
+    gui.setup();
+    gui.add(freqRatio.setup("freqRatio", 1.3, 1.0, 2.0));
+    gui.add(zscale.setup("z-scale", 0.0, 0.0, 10.0));
+    gui.add(fov.setup("fov", 60, 10, 180));
+    gui.loadFromFile("settings.xml");
+    */
     cam.setFov(100);
 }
 
@@ -56,7 +57,7 @@ void ofApp::draw(){
     cam.end();
     ofDisableDepthTest();
     
-    // gui.draw();
+    gui.draw();
     
     ofColor(255);
     ofDrawCircle(mouseX, mouseY, 10);
@@ -77,7 +78,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
         s->zscale = zscale;
         imageSynths.push_back(s);
         
-        freqRatio *= 1.01;
+        freqRatio *= 1.001;
     }
 }
 

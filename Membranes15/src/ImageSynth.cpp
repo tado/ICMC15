@@ -6,7 +6,8 @@ ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
     
     for (int i = 0; i < filterSize; i++) {
         synth[i] = new ofxSCSynth("simpleSine");
-        synth[i]->set("freq", powf(freqRatio, i) + 80);
+        //synth[i]->set("freq", powf(freqRatio, i) + 80);
+        synth[i]->set("freq", powf(freqRatio, i) + 40);
         synth[i]->set("detune", ofRandom(0.9,1.1));
         synth[i]->create();
         
@@ -40,11 +41,13 @@ ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
 }
 
 void ImageSynth::update(){
-    sumLevel = 0;
-    scanX = (ofGetFrameNum() - startFrame) % int(synthImage.getWidth());
-    for (int i = 0; i < filterSize; i++) {
-        synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) / float(filterSize) * 0.5);
-    }
+    //if (ofGetFrameNum() % 10 == 0) {
+        sumLevel = 0;
+        scanX = (ofGetFrameNum() - startFrame) % int(synthImage.getWidth());
+        for (int i = 0; i < filterSize; i++) {
+            synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) / float(filterSize) * 0.5);
+        }
+    //}
     
     zscale = ofNoise((ofGetElapsedTimef() - startFrame) / 10.0) * zscaleRatio;
 }
@@ -61,13 +64,13 @@ void ImageSynth::draw(){
 
             ofScale(1.0, 1.0, zscale);
             ofSetColor(255, 210);
-            inputImage.getTextureReference().bind();
+            inputImage.getTexture().bind();
             mesh.draw();
-            inputImage.getTextureReference().unbind();
+            inputImage.getTexture().unbind();
             
             ofSetColor(255);
             float x = (ofGetFrameNum() - startFrame) % int(inputImage.getWidth()) - inputImage.getWidth()/2.0;
-            ofLine(x, -inputImage.getHeight()*1000, x, inputImage.getHeight()*1000);
+            ofDrawLine(x, -inputImage.getHeight()*1000, x, inputImage.getHeight()*1000);
         }
         ofPopMatrix();
     }
