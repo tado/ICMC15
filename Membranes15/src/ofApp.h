@@ -42,4 +42,7 @@ public:
     float zscaleRatio, currentZscale;
     float freqRatio;
     bool pressed;
+    
+    static const int SYNTHNUM = 3;
+    static const int IMGNUM = 6;
 };

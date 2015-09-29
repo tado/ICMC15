@@ -36,4 +36,6 @@ public:
     float freqOffset;
     
     ofxUICanvas *gui;
+    
+    bool dropped;
 };

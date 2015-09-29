@@ -8,7 +8,9 @@ public:
     ImageSynth(ofImage image, ofVec3f pos, float freqRatio);
     ~ImageSynth();
     void update();
+    void updateSynth();
     void draw();
+    void drawWireframe();
     void createMesh();
     
     static const int filterSize = 50;
@@ -28,4 +30,5 @@ public:
     
     ofMesh mesh;
     int stepSize, xSteps, ySteps;
+    bool pressed;
 };

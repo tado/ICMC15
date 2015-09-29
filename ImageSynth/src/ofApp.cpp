@@ -3,10 +3,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofBackground(63);
+    ofBackground(0);
     //ofxSuperColliderServer::init(57110, 96000);
     //ofxSuperColliderServer::init();
-    
+    dropped = false;
     
     fx = new ofxSCSynth("fx");
     fx->create();
@@ -33,6 +33,8 @@ void ofApp::setup(){
     gui->loadSettings("main.xml");
     gui->autoSizeToFitWidgets();
     ofAddListener(gui->newGUIEvent,this,&ofApp::guiEvent);
+    
+    gui->setVisible(false);
 
     ofxUISlider *gratio = (ofxUISlider *)gui->getWidget("FREQ RATIO"); ratio = gratio->getValue();
     ofxUISlider *goffset = (ofxUISlider *)gui->getWidget("FREQ OFFSET"); freqOffset = goffset->getValue();
@@ -59,7 +61,9 @@ void ofApp::update(){
         }
     }
     for (int i = 0; i < filterSize; i++) {
-        synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) * amp);
+        if (dropped) {
+            synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) * amp);
+        }
     }
 }
 
@@ -71,7 +75,7 @@ void ofApp::draw(){
         inputImage.draw(0, 0, ofGetWidth(), ofGetHeight());
         ofSetColor(127);
         ofSetLineWidth(3.0);
-        ofLine(scanX, 0, scanX, ofGetHeight());
+        ofDrawLine(scanX, 0, scanX, ofGetHeight());
         ofSetLineWidth(1.0);
     }
     
@@ -106,7 +110,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
         // get image data
         draggedImages.assign( dragInfo.files.size(), ofImage() );
         for(unsigned int k = 0; k < dragInfo.files.size(); k++){
-            draggedImages[k].loadImage(dragInfo.files[k]);
+            draggedImages[k].load(dragInfo.files[k]);
         }
         draggedImages[0].resize(ofGetWidth(), ofGetHeight());
         inputImage = synthImage = draggedImages[0];
@@ -118,6 +122,8 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
         
         //reset scanX
         scanX = 0;
+        
+        dropped = true;
     }
 }
 

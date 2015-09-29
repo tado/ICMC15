@@ -16,8 +16,8 @@ void ofApp::setup(){
     
     sawNum = 0;
     zscaleRatio = currentZscale = 0.0;
-    freqRatio = 1.2;
-
+    freqRatio = 1.12;
+    
     //ofxSuperColliderServer::init(57110, 96000);
     //ofxSuperColliderServer::init();
     fx = new ofxSCSynth("fx");
@@ -26,18 +26,18 @@ void ofApp::setup(){
     sawFx->create();
     
     comb = new ofxSCSynth("col_comb");
-    comb->set("amp", 0.0);
+    //comb->set("amp", 0.0);
     comb->create();
     
     zscale.addListener(this, &ofApp::zscaleChanged);
     fov.addListener(this, &ofApp::fovChanged);
     /*
-    gui.setup();
-    gui.add(freqRatio.setup("freqRatio", 1.3, 1.0, 2.0));
-    gui.add(zscale.setup("z-scale", 0.0, 0.0, 10.0));
-    gui.add(fov.setup("fov", 60, 10, 180));
-    gui.loadFromFile("settings.xml");
-    */
+     gui.setup();
+     gui.add(freqRatio.setup("freqRatio", 1.3, 1.0, 2.0));
+     gui.add(zscale.setup("z-scale", 0.0, 0.0, 10.0));
+     gui.add(fov.setup("fov", 60, 10, 180));
+     gui.loadFromFile("settings.xml");
+     */
     cam.setFov(100);
 }
 
@@ -46,6 +46,16 @@ void ofApp::update(){
     for (int i = 0; i < imageSynths.size(); i++) {
         imageSynths[i]->update();
     }
+    if (imageSynths.size() < SYNTHNUM) {
+        for (int i = 0; i < imageSynths.size(); i++) {
+            imageSynths[i]->updateSynth();
+        }
+    } else {
+        for (int i = imageSynths.size() - SYNTHNUM; i < imageSynths.size(); i++) {
+            imageSynths[i]->updateSynth();
+        }
+    }
+    
     
     currentZscale += (zscaleRatio - currentZscale) / 1000.0;
     for (int i = 0; i < imageSynths.size(); i++) {
@@ -57,15 +67,12 @@ void ofApp::update(){
 void ofApp::draw(){
     if (pressed) {
         ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-        ofSetColor(0, 0, 0, 1);
+        ofSetColor(0, 63);
         ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-        //ofEnableBlendMode(OF_BLENDMODE_DISABLED);
-        //ofDisableDepthTest();
+        ofEnableBlendMode(OF_BLENDMODE_ADD);
     } else {
         ofEnableDepthTest();
-        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
     }
-    
     cam.begin();
     for (int i = 0; i < imageSynths.size(); i++) {
         imageSynths[i]->draw();
@@ -93,16 +100,31 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
         ImageSynth *s = new ImageSynth(draggedImages[0], pos, freqRatio);
         s->zscale = zscale;
         imageSynths.push_back(s);
-        
-        freqRatio *= 1.001;
+        if (imageSynths.size() > SYNTHNUM) {
+            for (int i = 0; i < imageSynths[0]->filterSize; i++) {
+                imageSynths[0]->synth[i]->free();
+            }
+        }
+        if (imageSynths.size() > IMGNUM) {
+            imageSynths.pop_front();
+            //delete imageSynths[0];
+        }
+        //freqRatio *= 1.001;
+        freqRatio += 0.01;
     }
 }
 
 ofApp::~ofApp(){
     fx->free();
-    for (int i = 0; i < imageSynths.size(); i++) {
-        delete imageSynths[i];
+    for (int j = 0; j < imageSynths.size(); j++) {
+        for (int i = 0; i < imageSynths[j]->filterSize; i++) {
+            imageSynths[j]->synth[i]->free();
+        }
     }
+    for (int i = 0; i < saws.size(); i++) {
+        saws[i]->synth->free();
+    }
+    comb->free();
     imageSynths.clear();
 }
 
@@ -139,12 +161,18 @@ void ofApp::keyPressed(int key){
         for (int i = 0; i < saws.size(); i++) {
             saws[i]->synth->free();
         }
+        comb->free();
         imageSynths.clear();
     }
     if (key == ' ') {
         ofSetBackgroundAuto(false);
+        ofEnableBlendMode(OF_BLENDMODE_ADD);
         pressed = true;
-        comb->set("amp", 1.0);
+        for (int i = 0; i < imageSynths.size(); i++) {
+            imageSynths[i]->pressed = true;
+        }
+        //comb->set("amp", 1.0);
+        comb->set("inamp", 1.0);
     }
 }
 
@@ -161,38 +189,45 @@ void ofApp::fovChanged(float & fov){
 void ofApp::keyReleased(int key){
     if (key == ' ') {
         ofSetBackgroundAuto(true);
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
         pressed = false;
-        comb->set("amp", 0.0);
+        for (int i = 0; i < imageSynths.size(); i++) {
+            imageSynths[i]->pressed = false;
+        }
+        comb->set("inamp", 0.0);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+    if (pressed) {
+        float deltime = ofMap(x, 0, ofGetWidth(), 0.005, 0.1);
+        comb->set("delaytime", deltime);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
-
+    
 }
 

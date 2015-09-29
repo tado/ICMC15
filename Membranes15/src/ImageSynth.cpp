@@ -3,11 +3,12 @@
 ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
     
     freqRatio = _freqRatio;
+    pressed = false;
     
     for (int i = 0; i < filterSize; i++) {
         synth[i] = new ofxSCSynth("simpleSine");
         //synth[i]->set("freq", powf(freqRatio, i) + 80);
-        synth[i]->set("freq", powf(freqRatio, i) + 20);
+        synth[i]->set("freq", powf(freqRatio, i) + 10);
         synth[i]->set("detune", ofRandom(0.9,1.1));
         synth[i]->create();
         
@@ -17,6 +18,8 @@ ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
     startFrame = ofGetFrameNum();
     pos = _pos;
     inputImage = synthImage = image;
+    inputImage.resize(1920, 1080);
+    synthImage.resize(1920, 1080);
     
     // modify image
     cv::Mat src_mat, dst_mat;
@@ -41,15 +44,15 @@ ImageSynth::ImageSynth(ofImage image, ofVec3f _pos, float _freqRatio){
 }
 
 void ImageSynth::update(){
-    
     sumLevel = 0;
     scanX = (ofGetFrameNum() - startFrame) % int(synthImage.getWidth());
-    if (ofGetFrameNum() % 2 == 0) {
-        for (int i = 0; i < filterSize; i++) {
-            synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) / float(filterSize) * 0.5);
-        }
-    }
     zscale = ofNoise(((ofGetElapsedTimef() - startFrame) * 2.0 - 1.0) / 10.0) * zscaleRatio;
+}
+
+void ImageSynth::updateSynth(){
+    for (int i = 0; i < filterSize; i++) {
+        synth[filterSize - i - 1]->set("mul", (1.0 - synthImage.getColor(scanX, i).getBrightness() / 255.0) / float(filterSize) * 0.5);
+    }
 }
 
 void ImageSynth::draw(){
@@ -63,10 +66,38 @@ void ImageSynth::draw(){
             rot += rotSpeed;
 
             ofScale(1.0, 1.0, zscale);
-            ofSetColor(255, 190);
+            if (pressed) {
+                ofSetColor(255, 12);
+            } else {
+                ofSetColor(255, 190);
+            }
             inputImage.getTexture().bind();
             mesh.draw();
             inputImage.getTexture().unbind();
+            
+            ofSetColor(255);
+            float x = (ofGetFrameNum() - startFrame) % int(inputImage.getWidth()) - inputImage.getWidth()/2.0;
+            ofDrawLine(x, -inputImage.getHeight()*1000, x, inputImage.getHeight()*1000);
+        }
+        ofPopMatrix();
+    }
+}
+
+void ImageSynth::drawWireframe(){
+    if (inputImage.getWidth() > 0) {
+        ofPushMatrix();
+        {
+            ofTranslate(pos);
+            ofRotateX(rot.x);
+            ofRotateY(rot.y);
+            ofRotateZ(rot.z);
+            rot += rotSpeed;
+            
+            ofScale(1.0, 1.0, zscale);
+            ofSetColor(255, 190);
+            //inputImage.getTexture().bind();
+            mesh.drawWireframe();
+            //inputImage.getTexture().unbind();
             
             ofSetColor(255);
             float x = (ofGetFrameNum() - startFrame) % int(inputImage.getWidth()) - inputImage.getWidth()/2.0;
