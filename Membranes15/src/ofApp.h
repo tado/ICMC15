@@ -28,7 +28,7 @@ public:
     void zscaleChanged(float & zscale);
     void fovChanged(float & fov);
     
-    ofxSCSynth *fx, *sawFx, *comb;
+    ofxSCSynth *fx, *sawFx, *comb, *sinFx;
     deque<ImageSynth*> imageSynths;
     ofEasyCam cam;
     

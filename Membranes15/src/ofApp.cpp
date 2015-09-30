@@ -24,6 +24,8 @@ void ofApp::setup(){
     fx->create();
     sawFx = new ofxSCSynth("col_closefx");
     sawFx->create();
+    sinFx = new ofxSCSynth("sinefx");
+    sinFx->create();
     
     comb = new ofxSCSynth("col_comb");
     //comb->set("amp", 0.0);
@@ -150,7 +152,7 @@ void ofApp::keyPressed(int key){
         }
     }
     if (key == 'z') {
-        if (saws.size() < 15) {
+        if (saws.size() < 19) {
             SawSynth *saw = new SawSynth(sawNum);
             sawNum++;
             zscaleRatio += 1.0;

@@ -6,6 +6,17 @@ SynthDef("simpleSine", {
 	Out.ar(3, out);
 }).store;
 
+SynthDef("sinefx", {
+	arg amp = 0.5;
+	var out;
+	out = In.ar(3, 2);
+	//out = Formlet.ar(out, LFNoise1.kr(2.0, 400, 1000), 0.001, 0.01);
+	//out = RLPF.ar(out, LFNoise1.kr(0.2, 500, 1100), 0.4);
+	8.do({ out = AllpassL.ar(out, 0.1, LFNoise2.kr([rrand(0.0, 0.01),rrand(0.0, 0.01)],0.01,0.06), 1.0) });
+	out = out * amp;
+	Out.ar(0, out);
+}).store;
+
 SynthDef("col_closesaw", {
 	arg fadeTime = 10, n = 0, rq = 0.3, detune = 0.001, base = 20, ratio = 1.5, harm = 1.5, amp = 0.2, gate=0;
 	var lfo, env, out;
