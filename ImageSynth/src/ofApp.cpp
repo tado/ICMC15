@@ -34,7 +34,7 @@ void ofApp::setup(){
     gui->autoSizeToFitWidgets();
     ofAddListener(gui->newGUIEvent,this,&ofApp::guiEvent);
     
-    gui->setVisible(false);
+    gui->setVisible(true);
 
     ofxUISlider *gratio = (ofxUISlider *)gui->getWidget("FREQ RATIO"); ratio = gratio->getValue();
     ofxUISlider *goffset = (ofxUISlider *)gui->getWidget("FREQ OFFSET"); freqOffset = goffset->getValue();

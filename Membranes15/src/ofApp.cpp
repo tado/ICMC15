@@ -82,6 +82,9 @@ void ofApp::draw(){
     
     gui.draw();
     
+    ofSetColor(255);
+    ofDrawBitmapString(ofToString(saws.size()), ofGetWidth()-100, ofGetHeight()-20);
+    
     //ofColor(255);
     //ofDrawCircle(mouseX, mouseY, 10);
 }
@@ -147,10 +150,12 @@ void ofApp::keyPressed(int key){
         }
     }
     if (key == 'z') {
-        SawSynth *saw = new SawSynth(sawNum);
-        sawNum++;
-        zscaleRatio += 1.0;
-        saws.push_back(saw);
+        if (saws.size() < 15) {
+            SawSynth *saw = new SawSynth(sawNum);
+            sawNum++;
+            zscaleRatio += 1.0;
+            saws.push_back(saw);
+        }
     }
     if (key == 'k') {
         for (int j = 0; j < imageSynths.size(); j++) {
